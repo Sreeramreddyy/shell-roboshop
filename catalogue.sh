@@ -37,9 +37,16 @@ dnf module enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? "Enabling NodeJS"
 dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "Install NodeJS"
-useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
-VALIDATE $? "Creating system user"
-mkdir /app 
+
+id roboshop
+if [ $? -ne 0 ]; then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    VALIDATE $? "Creating system user"
+else
+    echo -e "User already exist ... $Y SKIPPING $N"   
+fi
+
+mkdir -p /app 
 VALIDATE $? "Creating App directory"
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
 VALIDATE $? "Downloading catalogue application"
