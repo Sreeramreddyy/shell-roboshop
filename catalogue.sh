@@ -29,11 +29,11 @@ VALIDATE(){
         echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi    
 }
-#####NodeJS####
-dnf module disable nodejs -y #Disable current module
-VALIDATE $? "Disable NodeJS"
 
-dnf module enable nodejs:20 -y 
+#####NodeJS####
+dnf module disable nodejs -y 
+VALIDATE $? "Disable NodeJS"
+dnf module enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? "Enabling NodeJS"
 dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "Install NodeJS"
@@ -57,7 +57,7 @@ systemctl enable catalogue
 VALIDATE $? "Enable catalogue"
 systemctl start catalogue &>>$LOG_FILE
 VALIDATE $? "Start catalogue"
-cp mongo.repo /etc/yum.repos.d/mongo.repo
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
 VALIDATE $? "Copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "Install mongoDB client"
