@@ -59,9 +59,9 @@ npm install &>>$LOG_FILE
 VALIDATE $? "Install dependencies"
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>>$LOG_FILE
 VALIDATE $? "Copy system services"
-systemctl daemon-reload
+systemctl daemon-reload 
 VALIDATE $? "Daemon reload"
-systemctl enable catalogue 
+systemctl enable catalogue &>>$LOG_FILE
 VALIDATE $? "Enable catalogue"
 systemctl start catalogue &>>$LOG_FILE
 VALIDATE $? "Start catalogue"
@@ -71,5 +71,5 @@ dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "Install mongoDB client"
 mongosh --host $MONGODB_HOST </app/db/master-data.js
 VALIDATE $? "Load Catalogue product"
-systemctl restart catalogue
+systemctl restart catalogue &>>$LOG_FILE
 VALIDATE $? "Restart catalogue"
