@@ -11,6 +11,7 @@ SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-roboshop/
 START_TIME=$(date +%s)
 mkdir -p $LOGS_FOLDER
+SCRIPT_DIR=$(PWD)
 
 echo "Script started executed at: $(date)" | tee -a $LOG_FILE
 
@@ -28,20 +29,17 @@ VALIDATE(){
     fi    
 }
 
-dnf module disable redis -y &>>$LOG_FILE
-VALIDATE $? "Disabling default redis"
-dnf module enable redis:7 -y &>>$LOG_FILE
-VALIDATE $? "Enable redis 7 version" &>>$LOG_FILE
-dnf install redis -y  &>>$LOG_FILE
-VALIDATE $? "Installing redis"
+cp $SCRIPT_DIR/rabbitmq.repo /etc/yum.repos.d/rabbitmq.repo
 
-sed -i -e 's/127.0.0.1/0.0.0.0/g' -e '/protected-mode/ c protected-mode no' /etc/redis/redis.conf
+dnf install rabbitmq-server -y &>>$LOG_FILE
+VALIDATE $? "Install Rabbitmq"
+systemctl enable rabbitmq-server &>>$LOG_FILE
+VALIDATE $? "Enabling Rabbit server"
+systemctl start rabbitmq-server &>>$LOG_FILE
 
-systemctl enable redis &>>$LOG_FILE
-VALIDATE $? "Enabling redis Service"
-systemctl start redis &>>$LOG_FILE
-VALIDATE $? "Started redis service"
-
+rabbitmqctl add_user roboshop roboshop123 &>>$LOG_FILE
+rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*" &>>$LOG_FILE
+VALIDATE $? "Creating User permission for the Application"
 
 END_TIME=$(date +%s)
 TOTAL_TIME=$(( $END_TIME - START_TIME ))
