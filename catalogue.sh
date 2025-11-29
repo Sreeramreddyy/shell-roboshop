@@ -55,6 +55,7 @@ VALIDATE $? "Chaning to app directory"
 rm -rf /app/*
 unzip /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "Unzip Catalogue"
+
 npm install &>>$LOG_FILE
 VALIDATE $? "Install dependencies"
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>>$LOG_FILE
